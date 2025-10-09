@@ -38,3 +38,6 @@
 | 10주차 | 2025-12-28 | Chapter 11 API 리팩터링 |
 | 11주차 | 2026-01-04 | Chapter 12 상속 다루기 | 🎉 2026 🎉 스터디는 계속됩니다.😎 다음 책 선정 + 1월말까지 휴식기 |
 
+## 기타
+
+참고 링크 : https://github.com/WegraLee/Refactoring?tab=readme-ov-file
