@@ -1,0 +1,21 @@
+# .github/auto_assign.yml
+
+# 리뷰어를 추가하도록 설정합니다.
+addReviewers: true
+
+# 할당할 리뷰어 목록 (실제 사용자 이름으로 변경해야 합니다)
+reviewers:
+  - dkmqflx
+  - sumzdev
+  - brparkk
+  - dhyun2
+  - jinsupark4255
+  - sugonhwang
+
+# 할당할 리뷰어 수를 1명으로 지정합니다.
+numberOfReviewers: 1
+
+# PR 작성자는 자동으로 제외됩니다.
+# 필요하다면 skipKeywords 등을 추가하여 특정 키워드가 포함된 PR은 건너뛸 수 있습니다.
+# skipKeywords:
+#   - wip 

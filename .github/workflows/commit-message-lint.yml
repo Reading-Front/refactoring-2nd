@@ -1,0 +1,88 @@
+name: Commit Message Lint
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, edited, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  lint-commits:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Lint commit messages
+        id: lint
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.issue.number;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            // Fetch commits in PR (first page up to 250 commits)
+            const { data: commits } = await github.rest.pulls.listCommits({
+              owner,
+              repo,
+              pull_number: prNumber,
+              per_page: 250
+            });
+
+            const firstLine = (message) => (message || '').split('\n')[0];
+
+            // Allowed patterns
+            const chapterPattern = /^\[\d+장\]\s.+\s-\s.+$/;         // e.g. "[2장] 타입 - 정해인"
+            const docsPattern = /^\[docs\]\s.+$/i;                      // e.g. "[docs] README 수정"
+
+            const violations = [];
+            for (const c of commits) {
+              const msg = firstLine(c.commit && c.commit.message);
+              // Skip merge commits or bot-generated commits if needed
+              const isMerge = msg.startsWith('Merge ');
+              const isBot = (c.author && c.author.type === 'Bot');
+              if (isMerge || isBot) continue;
+
+              const ok = chapterPattern.test(msg) || docsPattern.test(msg);
+              if (!ok) {
+                violations.push(`"${msg}"`);
+              }
+            }
+
+            const violationsMd = violations.map(v => `- ${v}`).join('\n');
+            core.setOutput('has_violations', violations.length > 0 ? 'true' : 'false');
+            core.setOutput('violations_md', violationsMd);
+            core.setOutput('examples', `- [2장] 타입 - 정해인\n- [docs] README 수정`);
+            if (violations.length === 0) {
+              core.info('All commit messages comply with the required template.');
+            }
+
+      - name: Comment on PR with violations
+        if: steps.lint.outputs.has_violations == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.issue.number;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const body = [
+              '🚫 커밋 메시지 템플릿 검사 실패',
+              '',
+              '다음 커밋이 규칙을 따르지 않습니다:',
+              `${{ steps.lint.outputs.violations_md }}`,
+              '',
+              '허용 형식 예:',
+              `${{ steps.lint.outputs.examples }}`
+            ].join('\n');
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: prNumber,
+              body
+            });
+
+      - name: Fail workflow if violations exist
+        if: steps.lint.outputs.has_violations == 'true'
+        run: |
+          echo "커밋 메시지 템플릿 위반이 있습니다. PR 코멘트를 확인하세요." && exit 1

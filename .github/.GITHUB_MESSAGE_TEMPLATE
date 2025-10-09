@@ -1,0 +1,12 @@
+[?장] ?챕터명? - ?이름?
+
+또는
+
+[docs] ?문서수정?
+# ex) [2장] 타입 - 정해인
+# ex) [docs] README 수정
+# ------------------------------
+# 커밋 메세지 적용 방법
+# $ git config --local core.editor "code --wait" # 특정 워크스페이스에서 사용
+# $ git config commit.template .github/.GITHUB_MESSAGE_TEMPLATE
+# $ git commit 입력 후 커밋 메세지 입력 (-m 옵션 사용 ❌)
