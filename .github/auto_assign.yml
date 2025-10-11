@@ -10,7 +10,6 @@ reviewers:
   - brparkk
   - dhyun2
   - jinsupark4255
-  - sugonhwang
 
 # 할당할 리뷰어 수를 1명으로 지정합니다.
 numberOfReviewers: 1
